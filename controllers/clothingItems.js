@@ -8,25 +8,27 @@ const {
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) =>
+      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message })
+    );
 };
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl, owner } = req.body;
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch((err) => res.status(BAD_REQUEST).send({ message: err.message }));
 };
 
 const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(req.params.itemId)
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: "Item not found" });
+        return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
       return res.status(200).send(item);
     })
-    .catch((err) => res.status(400).send({ message: err.message }));
+    .catch((err) => res.status(BAD_REQUEST).send({ message: err.message }));
 };
 
 const likeItem = (req, res) => {

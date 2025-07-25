@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Aaroma1/se_project_express#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "mongoose": "^8.16.4",
     "validator": "^13.15.15"

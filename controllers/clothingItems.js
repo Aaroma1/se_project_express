@@ -21,14 +21,32 @@ const createItem = (req, res) => {
 };
 
 const deleteItem = (req, res) => {
-  ClothingItem.findByIdAndDelete(req.params.itemId)
+  ClothingItem.findById(req.params.itemId)
+    .orFail()
     .then((item) => {
-      if (!item) {
+      if (item.owner.toString() !== req.user._id) {
+        return res
+          .status(FORBIDDEN)
+          .send({ message: "You do not have permission to delete this item." });
+      }
+      return ClothingItem.findByIdAndDelete(req.params.itemId).then(() =>
+        res.status(200).send({ message: "Item deleted successfully." })
+      );
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
         return res.status(NOT_FOUND).send({ message: "Item not found" });
       }
-      return res.status(200).send(item);
-    })
-    .catch((err) => res.status(BAD_REQUEST).send({ message: err.message }));
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid item ID format" });
+      }
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
 };
 
 const likeItem = (req, res) => {

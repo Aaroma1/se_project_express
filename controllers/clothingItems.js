@@ -3,13 +3,16 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
+  FORBIDDEN,
 } = require("../utils/errors");
 
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((err) =>
-      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message })
+    .catch(() =>
+      res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." })
     );
 };
 
@@ -17,7 +20,16 @@ const createItem = (req, res) => {
   const { name, weather, imageUrl, owner } = req.body;
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send(item))
-    .catch((err) => res.status(BAD_REQUEST).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res
+          .status(BAD_REQUEST)
+          .send({ message: "Invalid data passed to create item." });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
 };
 
 const deleteItem = (req, res) => {
@@ -43,7 +55,7 @@ const deleteItem = (req, res) => {
           .status(BAD_REQUEST)
           .send({ message: "Invalid item ID format" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
@@ -67,7 +79,7 @@ const likeItem = (req, res) => {
           .status(BAD_REQUEST)
           .send({ message: "Invalid item ID format" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
@@ -91,7 +103,7 @@ const dislikeItem = (req, res) => {
           .status(BAD_REQUEST)
           .send({ message: "Invalid item ID format" });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });

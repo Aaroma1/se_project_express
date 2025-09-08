@@ -59,16 +59,6 @@ module.exports.validateUserAuth = celebrate({
   }),
 });
 
-module.exports.validateUserID = celebrate({
-  params: Joi.object().keys({
-    userId: Joi.string().required().hex().length(24).messages({
-      "string.hex": 'The "userId" field must be a valid hexadecimal value',
-      "string.length": 'The "userId" field must be exactly 24 characters long',
-      "string.empty": 'The "userId" field must be filled in',
-    }),
-  }),
-});
-
 module.exports.validateClothingItemID = celebrate({
   params: Joi.object().keys({
     itemId: Joi.string().required().hex().length(24).messages({
